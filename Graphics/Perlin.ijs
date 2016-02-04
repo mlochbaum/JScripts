@@ -52,6 +52,8 @@ g1=: sh <:+:B ?@$ 0
 EMPTY
 )
 
+init ''
+
 NB. Sample generation of noise at many scales
 NB. Add the layers of n to get fractal noise
 NB. g2 =. (+:>:B) $ (% +/&.:*:"1) B {. (#~ 1>:+/&.:*:"1) <:+:((2*B),2)?@$0
