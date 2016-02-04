@@ -52,7 +52,7 @@ NB. =========================================================
 NB. Conversion tables
 NB. The two tables following define all possible conversions between
 NB. dense (i.e. non-sparse) types.
-NB. The verbs (c) and (ct) are defined in the body of (typecast).
+NB. The verbs (c) and (ct) are defined in the body of (get_typecast).
 
 NB. ---------------------------------------------------------
 NB. Numeric conversions
@@ -82,38 +82,45 @@ C2   5&u:   ]
 )
 
 NB. List of all conversions
-CONVS =: NUM_CONV;<CHAR_CONV
+CONVS =: NUM_CONV,:CHAR_CONV
 
 NB. =========================================================
+NB. u and v are types. Get a verb to convert from type v to u.
+get_typecast =: 2 : 0
+  if. u=v do. ] return. end.
+
+  NB. Check verbs
+  NB. The left argument is the original y and the right is the converted y.
+  NB. Return the right argument, or fail if it does not meet a condition.
+  ct =. [:`]@.(u=3!:0@])  NB. Check type
+  c  =. [:`]@.-:          NB. Check value
+
+  NB. If exactly one argument is sparse, use dense conversion.
+  sp =. is_sparse uv =. u,v
+  uv =. ((-*./) sp) to_dense^:["0 uv
+
+  NB. Look up in CONVS tables
+  cn =. uv (e.&> i. 1:)"0 _ {."1 CONVS
+  mesg =. u ('typecast: Incompatible types: ',[,' and ',])&(>@:toname) v
+  mesg assert (=/ *. _1~:{.) cn
+  'ts tab' =. ({.cn) { CONVS
+  NB. There must be a better way to get a verb from a string...
+  ". 'v =. ',tab {::~ ts i. |.uv
+
+  NB. Tack on conversion to/from sparse array
+  select. #. sp
+    case. 1 do. v@:($.^:_1) f.
+    case. 2 do. $.@:v f.
+    case. do.   v f.
+  end.
+)
+
 typecast =: 4 : 0 " 0 _
-'typecast: x must be a valid type' assert x e. TYPE_NUM
-ty =. 3!:0 y
-if. x=ty do. y return. end.
-NB. Check verbs
-NB. The left argument is the original y and the right is the converted y.
-NB. Return the right argument, or fail if it does not meet a condition.
-ct =. [:`]@.(x=3!:0@])  NB. Check type
-c  =. [:`]@.-:          NB. Check value
-try.
-  final =. ] NB. To be executed after conversion
-  select. #. is_sparse x,ty
-    case. 1 do. NB. y is sparse: make y dense before conversion
-      y =. $.^:_1 y
-      ty =. to_dense ty
-    case. 2 do. NB. x is sparse: make y sparse after conversion
-      x =. to_dense x
-      final =. $.
+  'typecast: x must be a valid type' assert x e. TYPE_NUM
+  tc =. x get_typecast ty =. 3!:0 y
+  try.
+    tc y
+  catch.
+    0 assert~ ty ('typecast: Error converting ',[,' to ',])&(>@:toname) x
   end.
-  NB. Go through all conversion tables
-  for_C. CONVS do.
-    'ts tab' =. >C
-    if. (ty,x) *./@:e. ts do.
-      final ". '(',(tab {::~ ts i.ty,x),') y'
-      return.
-    end.
-  end.
-catch.
-  0 assert~ ty ('typecast: Error converting ',[,' to ',])&(>@:toname) x
-end.
-0 assert~ ty ('typecast: Incompatible types: ',[,' and ',])&(>@:toname) x
 )
