@@ -65,13 +65,13 @@ Q0 =: 0 * 1r2
 
 makeconvtab =: [: (tonum@>@:({."1) ,&< }."1) }.@:totab
 NUM_CONV =: makeconvtab 0 : 0 NB. Numeric conversions
-     <-B-->   <--I--->   <-F-->   <-Z-->   <-----X----->   <-Q-->
-B      ]        I0&+      F0&+     Z0&+          x:         Q0&+
-I    c 0&~:      ]       c F0&+   c Z0&+         x:         Q0&+
-F    c 0&~:   c(ct<.)      ]       Z0&+    x:@:(c(ct<.))     x:
-Z    c 0&~:   c(ct<.)    c 9&o.     ]      x:@:(c(ct<.))   x:@:cF
-X    c 0&~:   ct _1&x:   c F0&+   c Z0&+         ]          Q0&+
-Q    c 0&~:   ct _1&x:   c F0&+   c Z0&+        c <.         ]
+     <-B-->   <--I--->   <-F-->   <-Z-->   <-----X----->   <----Q----->
+B      ]        I0&+      F0&+     Z0&+          x:            Q0&+
+I    c 0&~:      ]       c F0&+   c Z0&+         x:            Q0&+
+F    c 0&~:   c(ct<.)      ]       Z0&+    x:@:(c(ct<.))        x:
+Z    c 0&~:   c(ct<.)    c 9&o.     ]      x:@:(c(ct<.))   x:@:(c 9&o.)
+X    c 0&~:   ct _1&x:   c F0&+   c Z0&+         ]             Q0&+
+Q    c 0&~:   ct _1&x:   c F0&+   c Z0&+        c <.            ]
 )
 
 NB. ---------------------------------------------------------
