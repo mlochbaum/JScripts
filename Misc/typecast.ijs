@@ -1,0 +1,119 @@
+NB. Cast from one type to another, if possible.
+
+NB. =========================================================
+NB. This script defines the verb typecast.
+NB. x is the type to cast to (a power of two, as in the output of 3!:0).
+NB. y is any noun.
+NB. typecast will either convert y to type x or throw an error.
+NB. If an error is not thrown, then (y -: x typecast y) returns 1.
+NB. Furthermore, if any value z of type x satisfies (y -: z), then
+NB. typecast may not fail.
+NB. Note that (-:) uses tolerant comparison.
+
+typecast =: typecast_ptype_
+
+NB. =========================================================
+cocurrent 'ptype'
+
+NB. Turn a text table into a boxed array
+totab =: [: ((a: -.~ <@deb;._1)"1~ *./@:=&' ') ' ' ,. ];._2 
+
+NB. Type numbers and nicknames
+TYPE_TAB =: totab 0 : 0
+NUM      NAME    SHORT  FULLNAME
+1        B01     B      boolean
+2        LIT     C      literal (character)
+4        INT     I      integer
+8        FL      F      double (IEEE floating point)
+16       CMPX    Z      complex
+32       BOX     A      boxed
+64       XNUM    X      extended precision integer
+128      RAT     Q      rational number
+256      BIT     BT     bit boolean
+1024     SB01    PB     sparse boolean
+2048     SLIT    PC     sparse literal (character)
+4096     SINT    PI     sparse integer
+8192     SFL     PD     sparse floating point
+16384    SCMPX   PZ     sparse complex
+32768    SBOX    PA     sparse boxed
+65536    SBT     SB     symbol
+131072   C2T     C2     unicode (2-byte characters)
+)
+('TYPE_'&,&.> {.TYPE_TAB) =: (".@>&.>@{. , }.) <"_1 |:}.TYPE_TAB
+tonum =: (TYPE_NUM {~ TYPE_SHORT&i.)@:boxopen@:,
+toname=: TYPE_FULLNAME {~ TYPE_NUM&i.
+
+NB. Check if a type is sparse
+is_sparse =: [: (10&<: *. 15&>:) 2 <.@^. ]
+NB. Convert to dense type
+to_dense =: <.@%&1024
+
+NB. =========================================================
+NB. Conversion tables
+NB. The two tables following define all possible conversions between
+NB. dense (i.e. non-sparse) types.
+NB. The verbs (c) and (ct) are defined in the body of (typecast).
+
+NB. ---------------------------------------------------------
+NB. Numeric conversions
+
+NB. Zeros of various types
+I0 =: -~2
+F0 =: -~1.1
+Z0 =: j.0
+Q0 =: 0 * 1r2
+
+makeconvtab =: [: (tonum@>@:({."1) ,&< }."1) }.@:totab
+NUM_CONV =: makeconvtab 0 : 0 NB. Numeric conversions
+     <-B-->   <--I--->   <-F-->   <-Z-->   <-----X----->   <-Q-->
+B      ]        I0&+      F0&+     Z0&+          x:         Q0&+
+I    c 0&~:      ]       c F0&+   c Z0&+         x:         Q0&+
+F    c 0&~:   c(ct<.)      ]       Z0&+    x:@:(c(ct<.))     x:
+Z    c 0&~:   c(ct<.)    c 9&o.     ]      x:@:(c(ct<.))   x:@:cF
+X    c 0&~:   ct _1&x:   c F0&+   c Z0&+         ]          Q0&+
+Q    c 0&~:   ct _1&x:   c F0&+   c Z0&+        c <.         ]
+)
+
+NB. ---------------------------------------------------------
+CHAR_CONV =: makeconvtab 0 : 0 NB. Character conversions
+     <C->  <C2>
+C     ]    2&u:
+C2   5&u:   ]
+)
+
+NB. List of all conversions
+CONVS =: NUM_CONV;<CHAR_CONV
+
+NB. =========================================================
+typecast =: 4 : 0 " 0 _
+'typecast: x must be a valid type' assert x e. TYPE_NUM
+ty =. 3!:0 y
+if. x=ty do. y return. end.
+NB. Check verbs
+NB. The left argument is the original y and the right is the converted y.
+NB. Return the right argument, or fail if it does not meet a condition.
+ct =. [:`]@.(x=3!:0@])  NB. Check type
+c  =. [:`]@.-:          NB. Check value
+try.
+  final =. ] NB. To be executed after conversion
+  select. #. is_sparse x,ty
+    case. 1 do. NB. y is sparse: make y dense before conversion
+      y =. $.^:_1 y
+      ty =. to_dense ty
+    case. 2 do. NB. x is sparse: make y sparse after conversion
+      x =. to_dense x
+      final =. $.
+  end.
+  NB. Go through all conversion tables
+  for_C. CONVS do.
+    'ts tab' =. >C
+    if. (ty,x) *./@:e. ts do.
+      final ". '(',(tab {::~ ts i.ty,x),') y'
+      return.
+    end.
+  end.
+catch.
+  0 assert~ ty ('typecast: Error converting ',[,' to ',])&(>@:toname) x
+end.
+0 assert~ ty ('typecast: Incompatible types: ',[,' and ',])&(>@:toname) x
+)
