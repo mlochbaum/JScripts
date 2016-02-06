@@ -12,6 +12,14 @@ NB. Note that (-:) uses tolerant comparison.
 
 typecast =: typecast_ptype_
 
+NB. The verb numcast accepts only numeric types and finds the closest
+NB. number of type x to y (that is, minimizes (|y - x numcast y)).
+NB. If multiple such numbers exist, the largest is chosen (e.g. numcast
+NB. rounds up).
+NB. numcast may not fail on numeric types.
+
+numcast =: numcast_ptype_
+
 NB. =========================================================
 cocurrent 'ptype'
 
@@ -115,12 +123,57 @@ get_typecast =: 2 : 0
   end.
 )
 
-typecast =: 4 : 0 " 0 _
-  'typecast: x must be a valid type' assert x e. TYPE_NUM
-  tc =. x get_typecast ty =. 3!:0 y
+
+CAST_TEMPLATE =: (0 : 0)
+  'NAME: x must be a valid type' assert x e. TYPE_NUM
+  tc =. x GET_CAST ty =. 3!:0 y
   try.
     tc y
   catch.
-    0 assert~ ty ('typecast: Error converting ',[,' to ',])&(>@:toname) x
+    0 assert~ ty ('NAME: Error converting ',[,' to ',])&(>@:toname) x
   end.
 )
+makecast =: 2 :'4 :(CAST_TEMPLATE rplc ''GET_CAST'';v;''NAME'';u)'
+typecast =: 'typecast' makecast 'get_typecast'
+
+
+NB. =========================================================
+NB. Conversion table for numcast
+
+Re =: 9&o.
+rox =: 1r2 <.@:+ ]
+MAX =: ->: MIN =: <.-: +:^:(4=3!:0)^:_ ]_1
+round =: [: (((MAX*-.@]) + [: <. MIN>.*) <:&MAX) 0.5&+
+clip =: MIN >. MAX <. ]
+
+NUMCAST_CONV =: makeconvtab 0 : 0 NB. Numeric conversions
+    <--B-->   <-----I----->   <F->   <Z->   <----X---->   <-Q-->
+B      ]           I0&+       F0&+   Z0&+        x:        Q0&+
+I     >:&1          ]         F0&+   Z0&+        x:        Q0&+
+F    >:&0.5       round        ]     Z0&+     rox@:x:       x:
+Z   0.5<:Re      round@Re     9&o.    ]     rox@:x:@:Re   x:@:Re
+X     >:&1      _1 x:clip     F0&+   Z0&+        ]         Q0&+
+Q    >:&1r2   _1 x:rox@clip   F0&+   Z0&+       rox         ]
+)
+
+NB. =========================================================
+get_numcast =: 2 : 0
+  'ts tab' =. NUMCAST_CONV
+  'numcast: Types must be numeric' assert (u,v) *./@:e. ts
+  if. u=v do. ] return. end.
+
+  NB. If exactly one argument is sparse, use dense conversion.
+  sp =. is_sparse uv =. u,v
+  uv =. ((-*./) sp) to_dense^:["0 uv
+
+  ". 'v =. ',tab {::~ ts i. |.uv
+
+  NB. Tack on conversion to/from sparse array
+  select. #. sp
+    case. 1 do. v@:($.^:_1) f.
+    case. 2 do. $.@:v f.
+    case. do.   v f.
+  end.
+)
+
+numcast =: 'numcast' makecast 'get_numcast'
