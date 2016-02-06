@@ -135,7 +135,7 @@ CAST_TEMPLATE =: (0 : 0)
     0 assert~ ty ('NAME: Error converting ',[,' to ',])&(>@:toname) x
   end.
 )
-makecast =: 2 :'4 :(CAST_TEMPLATE rplc ''GET_CAST'';v;''NAME'';u)'
+makecast =: 2 :'4 :(CAST_TEMPLATE rplc ''GET_CAST'';v;''NAME'';u) " 0 _'
 typecast =: 'typecast' makecast 'get_typecast'
 
 
