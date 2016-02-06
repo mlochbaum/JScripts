@@ -148,13 +148,13 @@ round =: [: (((MAX*-.@]) + [: <. MIN>.*) <:&MAX) 0.5&+
 clip =: MIN >. MAX <. ]
 
 NUMCAST_CONV =: makeconvtab 0 : 0 NB. Numeric conversions
-    <--B-->   <-----I----->   <F->   <Z->   <----X---->   <-Q-->
-B      ]           I0&+       F0&+   Z0&+        x:        Q0&+
-I     >:&1          ]         F0&+   Z0&+        x:        Q0&+
-F    >:&0.5       round        ]     Z0&+     rox@:x:       x:
-Z   0.5<:Re      round@Re     9&o.    ]     rox@:x:@:Re   x:@:Re
-X     >:&1      _1 x:clip     F0&+   Z0&+        ]         Q0&+
-Q    >:&1r2   _1 x:rox@clip   F0&+   Z0&+       rox         ]
+    <--B-->   <-----I----->   <--F--->   <--Z--->   <----X---->   <-Q-->
+B      ]           I0&+         F0&+       Z0&+          x:        Q0&+
+I     >:&1          ]           F0&+       Z0&+          x:        Q0&+
+F    >:&0.5       round          ]         Z0&+       rox@:x:       x:
+Z   0.5<:Re      round@Re       9&o.        ]       rox@:x:@:Re   x:@:Re
+X     >:&1      _1 x:clip     F0+_1&x:   Z0+_1&x:        ]         Q0&+
+Q    >:&1r2   _1 x:rox@clip   F0+_1&x:   Z0+_1&x:       rox         ]
 )
 
 NB. =========================================================
