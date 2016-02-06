@@ -71,15 +71,17 @@ F0 =: -~1.1
 Z0 =: j.0
 Q0 =: 0 * 1r2
 
+Re =: 9&o.
+
 makeconvtab =: [: (tonum@>@:({."1) ,&< }."1) }.@:totab
 NUM_CONV =: makeconvtab 0 : 0 NB. Numeric conversions
-     <-B-->   <--I--->   <-F-->   <-Z-->   <-----X----->   <----Q----->
-B      ]        I0&+      F0&+     Z0&+          x:            Q0&+
-I    c 0&~:      ]       c F0&+   c Z0&+         x:            Q0&+
-F    c 0&~:   c(ct<.)      ]       Z0&+    x:@:(c(ct<.))        x:
-Z    c 0&~:   c(ct<.)    c 9&o.     ]      x:@:(c(ct<.))   x:@:(c 9&o.)
-X    c 0&~:   ct _1&x:   c F0&+   c Z0&+         ]             Q0&+
-Q    c 0&~:   ct _1&x:   c F0&+   c Z0&+        c <.            ]
+     <-B-->   <--I--->   <-F-->   <-Z-->   <------X------->   <---Q---->
+B      ]        I0&+      F0&+     Z0&+           x:             Q0&+
+I    c 0&~:      ]       c F0&+   c Z0&+          x:             Q0&+
+F    c 0&~:   c(ct<.)      ]       Z0&+     x:@:(c(ct<.))         x:
+Z    c 0&~:   c(ct<.)     c Re      ]      x:@:(c(ct<.@Re))   x:@:(c Re)
+X    c 0&~:   ct _1&x:   c F0&+   c Z0&+          ]              Q0&+
+Q    c 0&~:   ct _1&x:   c F0&+   c Z0&+         c <.             ]
 )
 
 NB. ---------------------------------------------------------
@@ -140,7 +142,6 @@ typecast =: 'typecast' makecast 'get_typecast'
 NB. =========================================================
 NB. Conversion table for numcast
 
-Re =: 9&o.
 rox =: 1r2 <.@:+ ]
 MAX =: ->: MIN =: <.-: +:^:(4=3!:0)^:_ ]_1
 round =: [: (((MAX*-.@]) + [: <. MIN>.*) <:&MAX) 0.5&+
