@@ -72,14 +72,16 @@ Z0 =: j.0
 Q0 =: 0 * 1r2
 
 Re =: 9&o.
+MAX =: ->: MIN =: <.-: +:^:(4=3!:0)^:_ ]_1
+rnd =: [: (((MAX*-.@]) + [: <. MIN>.*) <:&MAX) 0.5&+
 
 makeconvtab =: [: (tonum@>@:({."1) ,&< }."1) }.@:totab
 NUM_CONV =: makeconvtab 0 : 0 NB. Numeric conversions
      <-B-->   <--I--->   <-F-->   <-Z-->   <------X------->   <---Q---->
 B      ]        I0&+      F0&+     Z0&+           x:             Q0&+
 I    c 0&~:      ]       c F0&+   c Z0&+          x:             Q0&+
-F    c 0&~:   c(ct<.)      ]       Z0&+     x:@:(c(ct<.))         x:
-Z    c 0&~:   c(ct<.)     c Re      ]      x:@:(c(ct<.@Re))   x:@:(c Re)
+F    c 0&~:    c rnd       ]       Z0&+     x:@:(c(ct<.))         x:
+Z    c 0&~:   c rnd@Re    c Re      ]      x:@:(c(ct<.@Re))   x:@:(c Re)
 X    c 0&~:   ct _1&x:   c F0&+   c Z0&+          ]              Q0&+
 Q    c 0&~:   ct _1&x:   c F0&+   c Z0&+         c <.             ]
 )
@@ -142,19 +144,17 @@ typecast =: 'typecast' makecast 'get_typecast'
 NB. =========================================================
 NB. Conversion table for numcast
 
-rox =: 1r2 <.@:+ ]
-MAX =: ->: MIN =: <.-: +:^:(4=3!:0)^:_ ]_1
-round =: [: (((MAX*-.@]) + [: <. MIN>.*) <:&MAX) 0.5&+
+rnx =: 1r2 <.@:+ ]
 clip =: MIN >. MAX <. ]
 
 NUMCAST_CONV =: makeconvtab 0 : 0 NB. Numeric conversions
     <--B-->   <-----I----->   <--F--->   <--Z--->   <----X---->   <-Q-->
 B      ]           I0&+         F0&+       Z0&+          x:        Q0&+
 I     >:&1          ]           F0&+       Z0&+          x:        Q0&+
-F    >:&0.5       round          ]         Z0&+       rox@:x:       x:
-Z   0.5<:Re      round@Re       9&o.        ]       rox@:x:@:Re   x:@:Re
+F    >:&0.5        rnd           ]         Z0&+       rnx@:x:       x:
+Z   0.5<:Re       rnd@Re        9&o.        ]       rnx@:x:@:Re   x:@:Re
 X     >:&1      _1 x:clip     F0+_1&x:   Z0+_1&x:        ]         Q0&+
-Q    >:&1r2   _1 x:rox@clip   F0+_1&x:   Z0+_1&x:       rox         ]
+Q    >:&1r2   _1 x:rnx@clip   F0+_1&x:   Z0+_1&x:       rnx         ]
 )
 
 NB. =========================================================
