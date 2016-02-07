@@ -77,13 +77,13 @@ rnd =: [: (((MAX*-.@]) + [: <. MIN>.*) <:&MAX) 0.5&+
 
 makeconvtab =: [: (tonum@>@:({."1) ,&< }."1) }.@:totab
 NUM_CONV =: makeconvtab 0 : 0 NB. Numeric conversions
-     <-B-->   <--I--->   <-F-->   <-Z-->   <------X------->   <---Q---->
-B      ]        I0&+      F0&+     Z0&+           x:             Q0&+
-I    c 0&~:      ]       c F0&+   c Z0&+          x:             Q0&+
-F    c 0&~:    c rnd       ]       Z0&+     x:@:(c(ct<.))         x:
-Z    c 0&~:   c rnd@Re    c Re      ]      x:@:(c(ct<.@Re))   x:@:(c Re)
-X    c 0&~:   ct _1&x:   c F0&+   c Z0&+          ]              Q0&+
-Q    c 0&~:   ct _1&x:   c F0&+   c Z0&+         c <.             ]
+     <-B-->   <--I--->   <-F-->   <-Z-->   <---X---->   <---Q---->
+B      ]        I0&+      F0&+     Z0&+        x:          Q0&+
+I    c 0&~:      ]       c F0&+   c Z0&+       x:          Q0&+
+F    c 0&~:    c rnd       ]       Z0&+     c <.@x:         x:
+Z    c 0&~:   c rnd@Re    c Re      ]      c <.@x:@Re   x:@:(c Re)
+X    c 0&~:   ct _1&x:   c F0&+   c Z0&+       ]           Q0&+
+Q    c 0&~:   ct _1&x:   c F0&+   c Z0&+      c <.          ]
 )
 
 NB. ---------------------------------------------------------
