@@ -40,7 +40,7 @@ str =: 3 :'5!:5<''y'''
 gettype =: 3 :0 "0@:(boxopen"1)
   if. y e. parens do. _2+parens i.y
   elseif. y e. nouns do. 0
-  elseif. ({.>y) e. '_0123456789' do. 0
+  elseif. ({.>y) e. '_0123456789''' do. 0
   elseif. y e. verbs do. 1
   elseif. y e. adverbs do. 2
   elseif. y e. conjunctions do. 3
