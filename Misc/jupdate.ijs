@@ -1,6 +1,34 @@
-NB. Code must be pure functional (no side effects) with a few exceptions:
-NB. - Global assignment with =:
-NB. - require (not load!) statements at the beginning of the script
+0 : 0
+Jupdate has a simple goal. Take a J script that has some inputs (variables
+and files), and update the outputs when the inputs change. It is meant for
+scripts which are expensive to run, and need to be run many times with
+small changes.
+
+To load a script, use
+   sc =: addscript 'path.ijs'
+where addscript returns a locale. Then the script can be re-run with
+   update__sc 'list of names'
+.
+
+Code must be pure functional (no side effects) with a few exceptions:
+- Global assignment with (=:).
+- require (not load!) statements at the beginning of the script.
+- Declared read and write verbs (see below).
+
+Read and write verbs function like fread and fwrite, but are allowed to
+do additional processing. Read verbs must have one argument which consists
+of one or more filepaths (in a boxed list of strings, or, if there is only
+one file, a boxed or unboxed string). Write verbs must have two arguments,
+where the left has the same form. To declare a read or write verb, use
+(read declareread__sc) or (write declarewrite__sc).
+
+Three types of changes are possible:
+- Changes to global variables. Currently you may only change names which
+  are assigned somewhere in the program; this replaces the first
+  assignment to that name.
+- Changes to files which are read with a declared read verb.
+- Changes to the script itself. This is not yet supported.
+)
 
 addscript =: addscript_pjupdate_
 update =: update_pjupdate_
@@ -154,4 +182,5 @@ update =: 3 : 0
     3 :'".y' i{::LINES
     TIMES =: ct i} TIMES
   end.
+  EMPTY
 )
