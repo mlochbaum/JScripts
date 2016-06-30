@@ -26,7 +26,10 @@ Three types of changes are possible:
 - Changes to global variables. Currently you may only change names which
   are assigned somewhere in the program; this replaces the first
   assignment to that name.
-- Changes to files which are read with a declared read verb.
+- Changes to files which are read with a declared read verb. Jupdate uses
+  timestamps to track whether files have been updated, so it will fail in
+  various ways if (6!:0) and the file timestamps are not consistent and
+  causal.
 - Changes to the script itself. This is not yet supported.
 )
 
