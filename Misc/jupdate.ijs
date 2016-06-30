@@ -48,6 +48,11 @@ create =: 3 : 0
   LINES=: 0$a:    NB. Lines in script (after modification)
   DEPS =: 0 2$a:  NB. Write, read for each line
   TIMES=: 0 6$0   NB. Last time each line was executed
+
+  for_l. y do. addline >l end.
+
+  DEPM =: getdepm DEPS  NB. Dependency matrix
+  EMPTY
 )
 
 NB. ---------------------------------------------------------
@@ -77,9 +82,7 @@ addscript =: 3 : 0
   do_base_&.> r
 
   NB. Create locale
-  SCRIPT =: '' conew 'pjupdate'
-  for_l. y do. addline__SCRIPT >l end.
-  SCRIPT
+  SCRIPT =: y conew 'pjupdate'
 )
 
 NB. ---------------------------------------------------------
@@ -162,20 +165,30 @@ addline =: 3 : 0
 )
 
 NB. ---------------------------------------------------------
+NB. Compute dependency matrix from DEPS
+getdepm =: 3 : 0
+  tc =. +./ .*.~^:_  NB. Adjacency matrix transitive closure
+  NB. Matrix of forwards dependencies
+  fd =. tc (+. =@i.@#) +./@:e.&>/~/ |:y
+  NB. Backwards dependencies
+  bd =. |: (e.~&> <@i.@#) (#@>(I.@:) ([</.{~) i.~@:;) {."1 y
+  if. #e =. 4$.$. (|:bd) +./"1@:> fd do.
+    echo 'Redefinition in line A makes line B obselete.'rplc,'AB';"_1 ":|.|:e
+    echo 'Make your dependencies explicit or remove the line.'
+    assert 0
+  end.
+  tc fd +. bd  NB. Dependency matrix
+)
+
+NB. ---------------------------------------------------------
 NB. y is a list of names which have been changed.
 NB. File changes are detected automatically.
 update =: 3 : 0
   y =. , ;:^:(0=L.) y
-  redo =. 0"0 LINES  NB. Lines to be reevaluated
-  recn =. 0"0 NAMES  NB. Names to be recomputed
-  for_i. i.#LINES do.
-    'wr re' =. i { DEPS
-    if. (e.&y +.&(+./) (i{TIMES) updatedafter (#~ '/'={.@>)) re do.
-      y =. y , wr
-      recn =. recn +. (NAMES e. wr) *. DEFD > i
-      redo =. 1 i} redo
-    end.
-  end.
+
+  NB. Redo a line if an input is in y or a file was changed.
+  redo =. TIMES ((e.&y@] +./@:, (updatedafter (#~ '/'={.@>))) >@{:)"_1 DEPS
+  redo =. DEPM +./ .*. redo
   for_i. I.redo do.
     ct =. 6!:0 ''
     'Timestamp error' assert 1 -.@e. ct updatedafter READ
