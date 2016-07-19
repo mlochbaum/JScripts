@@ -152,6 +152,22 @@ addline =: 3 : 0
       WRITE =: l
       l =. ,&'_base_'&.> l
     else. NB. Multiple assignment
+      NB. TODO verify that parenthesized sections are verbs
+      if. (;:'(&.>') ([ -: #@[{.]) col =. yw (#~0&=)&((1+#l)&}.) pl do.
+        NB. Number of ()&.> segments which can be collapsed
+        n =. (;:'(&.>') (#@[ ([*<.@%~) ] (=i.0:) #@]$[) col
+        n =. (+/\ 0=(1+#l)}.pl) >:@:I. n
+        rr =. (n+1+#l) }. yw
+        NB. TODO 0=#rr
+        if. 1<#rr do.
+          TEMP =. ,<gettemp''
+          addline TEMP , rr
+          rr =. TEMP
+        end.
+        ops =. (0<(+1&|.)pl) #&((1+#l)&}.) yw
+        addline@:(((;:'('),],(;:'{::'),l,(;:')=:')"_),ops,,&((;:'{::'),rr))"0 ":&.> i.#".>{.rr
+        return.
+      end.
       WRITE =: ;:^:(0=L.) ". ;:^:_1 l
       l =. (,&.>'()') ({.@[,],{:@[) 'inbase ' ; l
     end.
