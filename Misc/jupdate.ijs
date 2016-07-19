@@ -66,10 +66,14 @@ declareside =: 1 : 0
   EMPTY
 )
 NB. u is a name. Add the side effect of appending the argument to u.
-declareappend =. (2 :'v rplc ''X'';u' ('X =: X , ''@'',&.>boxopen y'))(3 :)(@]) declareside
+rplcXV =. 2 :'u rplc (;:''X V'') ,@,. 2{.boxopen v'
+declareappend =. ('X =: X , V boxopen y' rplcXV)(3 :)(@]) declareside
 NB. Declare reads from and writes to files.
-declareread  =: 'READ'  declareappend
-declarewrite =: 'WRITE' declareappend
+declareread  =: ('READ' ;'''@'',&.>') declareappend
+declarewrite =: ('WRITE';'''@'',&.>') declareappend
+NB. Declare reads from and writes to variables.
+declaredo    =: 'READ'  declareappend
+declareset   =: 'WRITE' declareappend
 
 NB. ---------------------------------------------------------
 NB. y is a filename containing a J script.
