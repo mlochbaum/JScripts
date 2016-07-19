@@ -92,7 +92,7 @@ NB. ---------------------------------------------------------
 NB. Utilities
 
 NB. Check which of files y were updated after time x
-updatedafter =: ((-:\:~)@:, (1 {:: 0{1!:0)@>)"1 0
+updatedafter =: ((-.@-:\:~)@:,: (1 {:: 0{1!:0@}.)@>)"1 0
 
 NB. Create a new temp variable
 gettemp =: 3 : 0
