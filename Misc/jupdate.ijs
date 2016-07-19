@@ -35,6 +35,10 @@ Three types of changes are possible:
 
 addscript =: addscript_pjupdate_
 update =: update_pjupdate_
+declareread  =: declareread_pjupdate_
+declarewrite =: declarewrite_pjupdate_
+declaredo    =: declaredo_pjupdate_
+declareset   =: declareset_pjupdate_
 
 NB. =========================================================
 cocurrent 'pjupdate'
