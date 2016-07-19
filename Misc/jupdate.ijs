@@ -158,6 +158,12 @@ addline =: 3 : 0
   NB. Note explicit do verb to avoid interference from local names
   3 :'".y' y1 =. ;:^:_1 l,r
 
+  if. 0=#WRITE do.
+    echo 'Line ',(":#LINES),' has no detected side effects.'
+    echo 'Make your dependencies explicit or remove the line.'
+    assert 0
+  end.
+
   NB. Check timestamps
   TIMES =: TIMES , ct =. 6!:0 ''
   'Timestamp error' assert 1 -.@e. ct updatedafter READ
