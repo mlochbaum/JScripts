@@ -107,7 +107,7 @@ gettemp =: 3 : 0
   'TEMP',":<:TEMP=:>:TEMP
 )
 NB. Change names in an assignment target to the base locale
-inbase =: [: ,&'_base_'&.> ;:^:(1<L.)
+inbase =: ([: >@{.`$:@.(1<#) ;:) ` (,&'_base_'&.>) @. (*@L.)
 
 
 NB. ---------------------------------------------------------
