@@ -83,7 +83,7 @@ NB. ---------------------------------------------------------
 NB. y is a filename containing a J script.
 addscript =: 3 : 0
   NB. Read, strip trailing spaces, drop blank lines
-  y =. a: -.~ <@:({.~ #<.1+(~:i:1:)&' ');._2 ]1!:1 boxopen y
+  y =. a: -.~ <@:({.~ #<.1+(~:i:1:)&' ');._2 ]1!:1 FILE =: boxopen y
   NB. Drop first-line #!
   'Error: empty script' assert 1<# y =. }.^:('#!' -: 2{.>@{.) y
 
