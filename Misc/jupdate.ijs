@@ -66,7 +66,7 @@ declareside =: 1 : 0
   EMPTY
 )
 NB. u is a name. Add the side effect of appending the argument to u.
-declareappend =. (2 :'v rplc ''X'';u' ('X =: X , boxopen y'))(3 :)(@]) declareside
+declareappend =. (2 :'v rplc ''X'';u' ('X =: X , ''@'',&.>boxopen y'))(3 :)(@]) declareside
 NB. Declare reads from and writes to files.
 declareread  =: 'READ'  declareappend
 declarewrite =: 'WRITE' declareappend
@@ -92,7 +92,7 @@ NB. ---------------------------------------------------------
 NB. Utilities
 
 NB. Check which of files y were updated after time x
-updatedafter =: ((-.@-:\:~)@:,: (1 {:: 0{1!:0@}.)@>)"1 0
+updatedafter =: ((-.@-:\:~)@:,: (1 {:: 0{1!:0@}.)@>)"1 0  (#~ '@'={.@>)
 
 NB. Create a new temp variable
 gettemp =: 3 : 0
@@ -196,7 +196,7 @@ update =: 3 : 0
   y =. , ;:^:(0=L.) y
 
   NB. Redo a line if an input is in y or a file was changed.
-  redo =. TIMES ((e.&y@] +./@:, (updatedafter (#~ '/'={.@>))) >@{:)"_1 DEPS
+  redo =. TIMES ((e.&y@] +./@:, updatedafter) >@{:)"_1 DEPS
   redo =. DEPM +./ .*. redo
   for_i. I.redo do.
     ct =. 6!:0 ''
